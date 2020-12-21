@@ -81,9 +81,9 @@ int main(void)
 
 //	ISO15693_SingleInventoryDemo();
 
-//	ISO15693_MultiInventoryDemo();
+	ISO15693_MultiInventoryDemo();
 
-    ISO14443_Init();
+//    ISO14443_Init();
 
     while (1)
     {

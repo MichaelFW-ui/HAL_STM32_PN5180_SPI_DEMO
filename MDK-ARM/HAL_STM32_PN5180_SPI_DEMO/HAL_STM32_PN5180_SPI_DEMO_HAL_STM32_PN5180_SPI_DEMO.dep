@@ -175,7 +175,7 @@ I (..\PN5180\phhalHw_Pn5180_Instr.h)(0x5FC700C8)
 I (..\PN5180\phalICode_Int.h)(0x5FC1E9EB)
 I (../Core/Inc/phalMfc_Int.h)(0x5FC700DB)
 I (../Core/Inc/iso14443.h)(0x5FC8A304)
-F (../Core/Src/main.c)(0x5FC8AC38)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\PN5180-I.\RTE\_HAL_STM32_PN5180_SPI_DEMO-IE:\install\Keil_v5\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-IE:\install\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o hal_stm32_pn5180_spi_demo\main.o --omf_browse hal_stm32_pn5180_spi_demo\main.crf --depend hal_stm32_pn5180_spi_demo\main.d)
+F (../Core/Src/main.c)(0x5FE067E8)(--c99 --gnu -c --cpu Cortex-M3 -D__MICROLIB -g -O0 --apcs=interwork --split_sections -I ../Core/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc -I ../Drivers/STM32F1xx_HAL_Driver/Inc/Legacy -I ../Drivers/CMSIS/Device/ST/STM32F1xx/Include -I ../Drivers/CMSIS/Include -I ..\PN5180-I.\RTE\_HAL_STM32_PN5180_SPI_DEMO-IE:\install\Keil_v5\Packs\Keil\STM32F1xx_DFP\2.3.0\Device\Include-IE:\install\Keil_v5\ARM\CMSIS\Include-D__UVISION_VERSION="528" -DSTM32F10X_MD -DUSE_HAL_DRIVER -DSTM32F103xB-o hal_stm32_pn5180_spi_demo\main.o --omf_browse hal_stm32_pn5180_spi_demo\main.crf --depend hal_stm32_pn5180_spi_demo\main.d)
 I (../Core/Inc/main.h)(0x5FC75FF1)
 I (../Drivers/STM32F1xx_HAL_Driver/Inc/stm32f1xx_hal.h)(0x5ED1F126)
 I (../Core/Inc/stm32f1xx_hal_conf.h)(0x5FC75FF1)
