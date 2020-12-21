@@ -16,3 +16,5 @@ STM32驱动PN5180模块读写ISO15693和ISO14443协议卡
 
 ![image](./m1-hardware.jpg)
 ![image](./m1-result.jpg)
+![image](./mifare_auth.jpg)
+
