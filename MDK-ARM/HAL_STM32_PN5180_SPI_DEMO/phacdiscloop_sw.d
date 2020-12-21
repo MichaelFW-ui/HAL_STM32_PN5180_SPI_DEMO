@@ -1,0 +1,12 @@
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\phacDiscLoop_Sw.c
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\ph_Status.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\ph_TypeDefs.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: E:\install\Keil_v5\ARM\ARMCC\Bin\..\include\stdint.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\ph_NxpBuild.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\ph_NxpBuild_App.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: E:\install\Keil_v5\ARM\ARMCC\Bin\..\include\string.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\ph_RefDefs.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\phacDiscLoop.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\phacDiscLoop_Sw.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\phNxpNfcRdLib_Config.h
+hal_stm32_pn5180_spi_demo\phacdiscloop_sw.o: ..\PN5180\phhalHw.h
