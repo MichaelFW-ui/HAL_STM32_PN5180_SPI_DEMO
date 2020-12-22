@@ -225,13 +225,13 @@ void ISO15693_MultiInventoryDemo(void)
     PN5180_Reset();
 
 __start:
-	
+
     /* Loads the ISO 15693 protocol into the RF registers */
     PN5180_LoadRFConfiguration(HHAL_HW_PN5180_PROTOCOL_ISO15693);
 
     /* Switches the RF field ON. */
     PN5180_FieleOn();
-	
+
     if((NumOfCards = ISO15693_Inventory16Slots(Buffer)) != 0)
     {
         debug("\r\n\r\n######################### %d Card detected ! #########################\r\n", NumOfCards);
@@ -263,9 +263,9 @@ __start:
 
     /* Switches the RF field OFF. */
     PN5180_FieleOff();
-	
-	delay_ms(1000);
-	
+
+    delay_ms(1000);
+
     goto __start;
 }
 

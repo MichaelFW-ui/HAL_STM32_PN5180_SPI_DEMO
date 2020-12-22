@@ -3,7 +3,7 @@
 <title>Static Call Graph - [HAL_STM32_PN5180_SPI_DEMO\HAL_STM32_PN5180_SPI_DEMO.axf]</title></head>
 <body><HR>
 <H1>Static Call Graph for image HAL_STM32_PN5180_SPI_DEMO\HAL_STM32_PN5180_SPI_DEMO.axf</H1><HR>
-<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Mon Dec 21 17:24:20 2020
+<BR><P>#&#060CALLGRAPH&#062# ARM Linker, 5060750: Last Updated: Tue Dec 22 09:03:16 2020
 <BR><P>
 <H3>Maximum Stack Usage =        240 bytes + Unknown(Cycles, Untraceable Function Pointers)</H3><H3>
 Call chain for Maximum Stack Depth:</H3>
@@ -396,9 +396,9 @@ Global Symbols
 <P><STRONG><a name="[5e]"></a>HAL_GPIO_Init</STRONG> (Thumb, 766 bytes, Stack size 36 bytes, stm32f1xx_hal_gpio.o(i.HAL_GPIO_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 36<LI>Call Chain = HAL_GPIO_Init
 </UL>
-<BR>[Called By]<UL><LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
+<BR>[Called By]<UL><LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_MspInit
+<LI><a href="#[75]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;MX_GPIO_Init
 <LI><a href="#[60]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_UART_MspInit
-<LI><a href="#[5d]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_MspInit
 </UL>
 
 <P><STRONG><a name="[7b]"></a>HAL_GPIO_ReadPin</STRONG> (Thumb, 16 bytes, Stack size 0 bytes, stm32f1xx_hal_gpio.o(i.HAL_GPIO_ReadPin))
@@ -554,7 +554,7 @@ Global Symbols
 <P><STRONG><a name="[68]"></a>ISO14443_Init</STRONG> (Thumb, 296 bytes, Stack size 56 bytes, iso14443.o(i.ISO14443_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 240<LI>Call Chain = ISO14443_Init &rArr; dbg_printf &rArr; vsprintf
 </UL>
-<BR>[Calls]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_SendREQAAndReadATQA
+<BR>[Calls]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_SendWakeUpTypeAAndReadATQA
 <LI><a href="#[73]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_ReadBlock
 <LI><a href="#[72]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_MifareAuthenticate
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_MifareAnticollision
@@ -602,8 +602,8 @@ Global Symbols
 <BR>[Called By]<UL><LI><a href="#[68]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_Init
 </UL>
 
-<P><STRONG><a name="[70]"></a>ISO14443_SendREQAAndReadATQA</STRONG> (Thumb, 68 bytes, Stack size 48 bytes, iso14443.o(i.ISO14443_SendREQAAndReadATQA))
-<BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = ISO14443_SendREQAAndReadATQA &rArr; ISO14443_CommandSendAndRecvData &rArr; PN5180_ClearIRQStatus &rArr; PN5180_WriteRegister &rArr; PN5180_WriteBytes &rArr; PN5180_Select
+<P><STRONG><a name="[70]"></a>ISO14443_SendWakeUpTypeAAndReadATQA</STRONG> (Thumb, 68 bytes, Stack size 48 bytes, iso14443.o(i.ISO14443_SendWakeUpTypeAAndReadATQA))
+<BR><BR>[Stack]<UL><LI>Max Depth = 152<LI>Call Chain = ISO14443_SendWakeUpTypeAAndReadATQA &rArr; ISO14443_CommandSendAndRecvData &rArr; PN5180_ClearIRQStatus &rArr; PN5180_WriteRegister &rArr; PN5180_WriteBytes &rArr; PN5180_Select
 </UL>
 <BR>[Calls]<UL><LI><a href="#[62]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_CommandSendAndRecvData
 </UL>
@@ -622,8 +622,8 @@ Global Symbols
 <P><STRONG><a name="[77]"></a>MX_SPI2_Init</STRONG> (Thumb, 60 bytes, Stack size 8 bytes, spi.o(i.MX_SPI2_Init))
 <BR><BR>[Stack]<UL><LI>Max Depth = 84<LI>Call Chain = MX_SPI2_Init &rArr; HAL_SPI_Init &rArr; HAL_SPI_MspInit &rArr; HAL_GPIO_Init
 </UL>
-<BR>[Calls]<UL><LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler
-<LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_Init
+<BR>[Calls]<UL><LI><a href="#[5c]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;HAL_SPI_Init
+<LI><a href="#[78]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;Error_Handler
 </UL>
 <BR>[Called By]<UL><LI><a href="#[35]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;main
 </UL>
@@ -943,7 +943,7 @@ Local Symbols
 <LI><a href="#[64]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PN5180_GetIRQStatus
 <LI><a href="#[67]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;PN5180_ClearIRQStatus
 </UL>
-<BR>[Called By]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_SendREQAAndReadATQA
+<BR>[Called By]<UL><LI><a href="#[70]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_SendWakeUpTypeAAndReadATQA
 <LI><a href="#[71]">&gt;&gt;</a>&nbsp;&nbsp;&nbsp;ISO14443_MifareAnticollision
 </UL>
 

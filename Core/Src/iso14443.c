@@ -202,11 +202,11 @@ __loops:
 //            iso14443a_crc(&TxBuffer[2], 7, &TxBuffer[9], &TxBuffer[10]);  // CRC_A
 //            TxLength += 2;
 
-			/* Switches the CRC extension on in Tx direction */
-			PN5180_WriteRegisterOrMask(CRC_TX_CONFIG, CRC_TX_CONFIG_TX_CRC_ENABLE_MASK);
-			
-			/* Switches the CRC extension on in Rx direction */
-			PN5180_WriteRegisterOrMask(CRC_RX_CONFIG, CRC_RX_CONFIG_RX_CRC_ENABLE_MASK);
+            /* Switches the CRC extension on in Tx direction */
+            PN5180_WriteRegisterOrMask(CRC_TX_CONFIG, CRC_TX_CONFIG_TX_CRC_ENABLE_MASK);
+
+            /* Switches the CRC extension on in Rx direction */
+            PN5180_WriteRegisterOrMask(CRC_RX_CONFIG, CRC_RX_CONFIG_RX_CRC_ENABLE_MASK);
 
             // 发送命令帧，成功则返回3字节：1字节SAK+2字节CRC_A
             if (ISO14443_CommandSendAndRecvData(TxBuffer, TxLength, RxBuffer, &RxLength) == 0 && RxLength != 0)
@@ -218,12 +218,12 @@ __loops:
             {
                 ret = -2;
             }
-			
-			/* Switches the CRC extension off in Tx direction */
-			PN5180_WriteRegisterAndMask(CRC_TX_CONFIG, ~((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
 
-			/* Switches the CRC extension off in Rx direction */
-			PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
+            /* Switches the CRC extension off in Tx direction */
+            PN5180_WriteRegisterAndMask(CRC_TX_CONFIG, ~((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
+
+            /* Switches the CRC extension off in Rx direction */
+            PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
         }
 
         //
@@ -400,8 +400,8 @@ __REQA:
     PN5180_WriteRegisterOrMask(SYSTEM_CONFIG, SYSTEM_CONFIG_START_SEND_POS);
 
     // 寻卡
-    //if ((ATQA = ISO14443_SendWakeUpTypeAAndReadATQA()) == 0)
-    if ((ATQA = ISO14443_SendREQAAndReadATQA()) == 0)
+    if ((ATQA = ISO14443_SendWakeUpTypeAAndReadATQA()) == 0)
+    //if ((ATQA = ISO14443_SendREQAAndReadATQA()) == 0)
     {
         debug(" RequestA Failed!\r\n");
         goto __exit;
@@ -452,9 +452,9 @@ static int ISO14443_CommandSendAndRecvData(const uint8_t* CmdFrame, uint8_t CmdF
     uint16_t TempLength = 0;
     uint8_t TxBuffer[2];
 
-	// 置0
-	*RxLength = 0;
-	
+    // 置0
+    *RxLength = 0;
+
     // 发送命令
     PN5180_WriteBytes(CmdFrame, CmdFrameLength);
 
