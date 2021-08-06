@@ -79,6 +79,8 @@ int main(void)
         ;
     }
 
+	dbg_printf(" ***** pn5180demo **** \r\n");
+	
 //	ISO15693_SingleInventoryDemo();
 
 //	ISO15693_MultiInventoryDemo();

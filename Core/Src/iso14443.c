@@ -95,6 +95,12 @@ uint16_t ISO14443_SendWakeUpTypeAAndReadATQA(void)
     Command[1] = 0X07;  /* LSB先发，只发送0X52的7bits */
     Command[2] = 0X52;
 
+    /* Switches the CRC extension off in Tx direction */
+    PN5180_WriteRegisterAndMask(CRC_TX_CONFIG, ~((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
+
+    /* Switches the CRC extension off in Rx direction */
+    PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
+
     if (ISO14443_CommandSendAndRecvData(Command, sizeof(Command), Buffer, &Length) == 0)
     {
         if (Length == 2) /* 正确则返回2字节的ATQA */
@@ -203,10 +209,10 @@ __loops:
 //            TxLength += 2;
 
             /* Switches the CRC extension on in Tx direction */
-            PN5180_WriteRegisterOrMask(CRC_TX_CONFIG, CRC_TX_CONFIG_TX_CRC_ENABLE_MASK);
+            PN5180_WriteRegisterOrMask(CRC_TX_CONFIG, ((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
 
             /* Switches the CRC extension on in Rx direction */
-            PN5180_WriteRegisterOrMask(CRC_RX_CONFIG, CRC_RX_CONFIG_RX_CRC_ENABLE_MASK);
+            PN5180_WriteRegisterOrMask(CRC_RX_CONFIG, ((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
 
             // 发送命令帧，成功则返回3字节：1字节SAK+2字节CRC_A
             if (ISO14443_CommandSendAndRecvData(TxBuffer, TxLength, RxBuffer, &RxLength) == 0 && RxLength != 0)
@@ -218,12 +224,6 @@ __loops:
             {
                 ret = -2;
             }
-
-            /* Switches the CRC extension off in Tx direction */
-            PN5180_WriteRegisterAndMask(CRC_TX_CONFIG, ~((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
-
-            /* Switches the CRC extension off in Rx direction */
-            PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
         }
 
         //
@@ -247,7 +247,7 @@ __loops:
             {
                 TxBuffer[TxLength++] = 0X20 + RxBuffer[0];  // NVB = 0X20 + 出现冲突的比特位置
                 TxBuffer[TxLength++] = RxBuffer[0];         // 后跟发生冲突的比特位置
-                goto __loops;
+                break;
             }
 
             //
@@ -260,38 +260,52 @@ __loops:
                 TxBuffer[TxLength++] = 0X30 + RxBuffer[1];
                 TxBuffer[TxLength++] = RxBuffer[0];
                 TxBuffer[TxLength++] = RxBuffer[1];
-                goto __loops;
+                break;
             }
             default:
                 break;
             }
+			
+			/* Switches the CRC extension off in Tx direction */
+			PN5180_WriteRegisterAndMask(CRC_TX_CONFIG, ~((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
+
+			/* Switches the CRC extension off in Rx direction */
+			PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
+			
+			goto __loops;
         }
     }
 
     return ret;
 }
 
-
-
 int ISO14443_ReadBlock(uint16_t BlockNo, uint8_t* BlockData)
 {
     int ret = 0;
-    uint8_t Buffer[32];
-    uint8_t Command[2] = {PHAL_MFC_CMD_READ, BlockNo};
-    uint32_t TempLength = 0;
+    uint8_t Command[] = {PHHAL_HW_PN5180_SET_INSTR_SEND_DATA, 0X00, PHAL_MFC_CMD_READ, BlockNo};
+    uint32_t RxLength = 0;
+	uint8_t RxBuffer[32];
+
+	// 打开TX_CRC
+    PN5180_WriteRegisterOrMask(CRC_TX_CONFIG, CRC_TX_CONFIG_TX_CRC_ENABLE_MASK);
+
+	// 关闭RX_CRC
+    PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~CRC_RX_CONFIG_RX_CRC_ENABLE_MASK);
 
     // 发送命令
     PN5180_WriteBytes(Command, sizeof(Command));
 
-    // 等待2ms的命令响应处理时间
-    delay_ms(2);
+    // 等待5ms的命令响应处理时间
+    delay_ms(5);
 
     // 检查否有数据收到
-    if ((TempLength = PN5180_GetRxStatus() & 0X1FFU) == 0)
+    if ((RxLength = PN5180_GetRxStatus() & 0X1FFU) == 0)
     {
         ret = -1;
         goto __exit;
     }
+	
+	memset(RxBuffer, 0X00, sizeof(RxBuffer));
 
     // 发送读取数据命令
     Command[0] = PHHAL_HW_PN5180_GET_INSTR_RETRIEVE_RX_DATA;
@@ -299,40 +313,68 @@ int ISO14443_ReadBlock(uint16_t BlockNo, uint8_t* BlockData)
     PN5180_WriteBytes(Command, 2);
 
     // 读取数据
-    PN5180_ReadBytes((uint8_t *)Buffer, TempLength);
-
+    PN5180_ReadBytes((uint8_t *)RxBuffer, RxLength);
+	
+	memcpy(BlockData, RxBuffer, 16);
+	
 __exit:
+	PN5180_ClearIRQStatus(PHHAL_HW_PN5180_IRQ_SET_CLEAR_ALL_MASK);
     return ret;
 }
 
 int ISO14443_WriteBlock(uint16_t BlockNo, const uint8_t BlockData[16])
 {
     int ret = 0;
-    uint16_t Buffer[32];
-    uint8_t Command[2] = {PHAL_MFC_CMD_WRITE, BlockNo};
-    uint32_t TempLength = 0;
+    uint32_t Length = 0;
+	uint8_t Command[32];
 
-    // 发送命令
-    PN5180_WriteBytes(Command, sizeof(Command));
+	// 打开TX_CRC
+    PN5180_WriteRegisterOrMask(CRC_TX_CONFIG, CRC_TX_CONFIG_TX_CRC_ENABLE_MASK);
+
+	// 关闭RX_CRC
+    PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~CRC_RX_CONFIG_RX_CRC_ENABLE_MASK);
+
+    // 发送写卡命令
+	Command[0] = PHHAL_HW_PN5180_SET_INSTR_SEND_DATA;
+	Command[1] = 0X00;
+	Command[2] = PHAL_MFC_CMD_WRITE;
+	Command[3] = BlockNo;
+    PN5180_WriteBytes(Command, 4);
 
     // 等待2ms的命令响应处理时间
     delay_ms(2);
 
     // 检查否有数据收到
-    if ((TempLength = PN5180_GetRxStatus() & 0X1FFU) == 0)
+    if ((Length = PN5180_GetRxStatus() & 0X1FFU) == 0)
     {
         ret = -1;
         goto __exit;
     }
-
+	
+	// 发送数据
+    Command[0] = PHHAL_HW_PN5180_SET_INSTR_SEND_DATA;
+    Command[1] = 0X00;
+	memcpy(&Command[2], BlockData, 16);
+    PN5180_WriteBytes(Command, 18);
+	
+	// 等待执行完毕
+	delay_ms(5);
+	
+	memset(Command, 0X00, sizeof(Command));
+	
     // 发送读取数据命令
     Command[0] = PHHAL_HW_PN5180_GET_INSTR_RETRIEVE_RX_DATA;
     Command[1] = 0X00;
     PN5180_WriteBytes(Command, 2);
-
-    // 读取数据
-    PN5180_ReadBytes((uint8_t *)Buffer, TempLength);
-
+	
+    // 接收 ACK/NAK
+    PN5180_ReadBytes((uint8_t *)Command, Length);
+	
+	if(Command[0] != PHAL_MFC_RESP_ACK)
+	{
+		ret = -2;
+	}
+	
 __exit:
     PN5180_ClearIRQStatus(PHHAL_HW_PN5180_IRQ_SET_CLEAR_ALL_MASK);
     return ret;
@@ -355,9 +397,11 @@ int ISO14443_GetVersion(void)
 
 void ISO14443_Init(void)
 {
+	char ch = 0;
     int i = 0;
     int ret = 0;
-    uint8_t RxBuffer[32] = {0};
+    uint8_t RxBuffer[16] = {0};
+	uint8_t TxBuffer[16] = {0};
     uint8_t UID[4] = {0};
     uint8_t KEY[6] = {0XFF, 0XFF, 0XFF, 0XFF, 0XFF, 0XFF};
     uint8_t BlockNo = 5;
@@ -369,9 +413,10 @@ void ISO14443_Init(void)
     PN5180_Reset();
 
 __REQA:
-
-    debug("\r\n\r\n");
-
+	
+	debug("\r\n\r\n\r\n\r\n");
+	debug("******************************  pn5180 iso14443 type A demo ******************************\r\n");
+	
     /* Loads the ISO 14443 protocol into the RF registers */
     PN5180_LoadRFConfiguration(HHAL_HW_PN5180_PROTOCOL_ISO14443);
 
@@ -384,12 +429,6 @@ __REQA:
     /* Crypto OFF */
     PN5180_WriteRegisterAndMask(SYSTEM_CONFIG, ~((uint32_t)SYSTEM_CONFIG_MFC_CRYPTO_ON_MASK));
 
-    /* Switches the CRC extension off in Tx direction */
-    PN5180_WriteRegisterAndMask(CRC_TX_CONFIG, ~((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
-
-    /* Switches the CRC extension off in Rx direction */
-    PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
-
     /* Clears the interrupt register IRQ_STATUS */
     PN5180_ClearIRQStatus(PHHAL_HW_PN5180_IRQ_SET_CLEAR_ALL_MASK);
 
@@ -401,7 +440,7 @@ __REQA:
 
     // 寻卡
     if ((ATQA = ISO14443_SendWakeUpTypeAAndReadATQA()) == 0)
-    //if ((ATQA = ISO14443_SendREQAAndReadATQA()) == 0)
+  //if ((ATQA = ISO14443_SendREQAAndReadATQA()) == 0)
     {
         debug(" RequestA Failed!\r\n");
         goto __exit;
@@ -427,16 +466,27 @@ __REQA:
 
     debug(" Mifare Authenticate OK.\r\n");
 
+	// 写块
+	memset(TxBuffer, ch++, sizeof(TxBuffer));
+	if((ret = ISO14443_WriteBlock(BlockNo, TxBuffer)) != 0)
+	{
+        debug(" Write Block Failed,ErrCode:%d\r\n", ret);
+        goto __exit;
+	}else
+	{
+		debug(" Write Block %02d Successfully.\r\n", BlockNo);
+	}
+	
+	// 读块
+	memset(RxBuffer, 0X00, sizeof(RxBuffer));
     if((ret = ISO14443_ReadBlock(BlockNo, RxBuffer)) != 0)
     {
         debug(" Read Block Failed,ErrCode:%d\r\n", ret);
         goto __exit;
     }
 
-    debug("BLOCK:");
-    for(i = 0; i < 16; i++)  debug("%02X", RxBuffer[i]);
-    debug("\r\n");
-
+    debug(" Read  Block %02d Successfully. [ ", BlockNo);    for(i = 0; i < 16; i++)  debug("%02X ", RxBuffer[i]);    debug("]\r\n");
+	
 __exit:
 
     PN5180_FieleOff();

@@ -1,1 +1,0 @@
-hal_stm32_pn5180_spi_demo\startup_stm32f103xb.o: startup_stm32f103xb.s
