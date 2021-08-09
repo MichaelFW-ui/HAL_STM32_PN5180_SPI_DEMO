@@ -182,12 +182,10 @@ int ISO14443_MifareAnticollision(uint8_t UID[4], uint8_t* SAK)
     TxBuffer[TxLength++] = 0X93;  // SEL
     TxBuffer[TxLength++] = 0X20;  // NVB,0X20为首次防冲撞命令
 
-__loops:
-
     if (ISO14443_CommandSendAndRecvData(TxBuffer, TxLength, RxBuffer, &RxLength) == 0)
     {
         //
-        // 不需要防冲撞或者防冲撞成功则返回5字节，RxBuffer前4个字节是UID，第五个字节是前面4字节UID的异或
+        // 不需要防冲撞或者防冲撞成功则返回5字节，RxBuffer前4个字节是UID，第五个字节是前面4字节UID的异或，我这里没有处理冲撞的情况
         //
         if (RxLength == 5)
         {
@@ -224,55 +222,6 @@ __loops:
             {
                 ret = -2;
             }
-        }
-
-        //
-        // 需要进行防冲撞
-        //
-        else
-        {
-            // 防冲撞命令帧
-            TxLength = 0;
-            TxBuffer[TxLength++] = PHHAL_HW_PN5180_SET_INSTR_SEND_DATA;
-            TxBuffer[TxLength++] = 0X00;
-            TxBuffer[TxLength++] = 0X93;                // SEL
-
-            switch(RxLength)
-            {
-            //
-            // 接收到的数据长度为1，表示多个卡的UID从UID0的位置开始出现不一致
-            // RxBuffer[0]为冲突的比特位置
-            //
-            case 1:
-            {
-                TxBuffer[TxLength++] = 0X20 + RxBuffer[0];  // NVB = 0X20 + 出现冲突的比特位置
-                TxBuffer[TxLength++] = RxBuffer[0];         // 后跟发生冲突的比特位置
-                break;
-            }
-
-            //
-            // 接收到的数据长度为2，表示多个卡的UID从UID1的位置开始出现不一致，
-            // RxBuffer[0]为UID0
-            // RxBuffer[1]为冲突的比特位置
-            //
-            case 2:
-            {
-                TxBuffer[TxLength++] = 0X30 + RxBuffer[1];
-                TxBuffer[TxLength++] = RxBuffer[0];
-                TxBuffer[TxLength++] = RxBuffer[1];
-                break;
-            }
-            default:
-                break;
-            }
-			
-			/* Switches the CRC extension off in Tx direction */
-			PN5180_WriteRegisterAndMask(CRC_TX_CONFIG, ~((uint32_t)CRC_TX_CONFIG_TX_CRC_ENABLE_MASK));
-
-			/* Switches the CRC extension off in Rx direction */
-			PN5180_WriteRegisterAndMask(CRC_RX_CONFIG, ~((uint32_t)CRC_RX_CONFIG_RX_CRC_ENABLE_MASK));
-			
-			goto __loops;
         }
     }
 
